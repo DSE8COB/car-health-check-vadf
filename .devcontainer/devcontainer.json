@@ -9,7 +9,8 @@
 		"--privileged"
 	],
 	"containerEnv": {
-		"GITHUB_API_TOKEN": "${localEnv:GITHUB_API_TOKEN}"
+		"GITHUB_API_TOKEN": "${localEnv:GITHUB_API_TOKEN}",
+		"HTTP_PROXY": "http://127.0.0.1:3128"
 	},
 	// Set *default* container specific settings.json values on container create.
 	"settings": {
