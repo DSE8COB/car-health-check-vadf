@@ -1,0 +1,13 @@
+﻿diff --git a/docs/architecture.md b/docs/architecture.md
+index 23c49ec..5e640eb 100644
+--- a/docs/architecture.md
++++ b/docs/architecture.md
+@@ -18,7 +18,7 @@ The solution consists of the following major components:
+ 
+ ```text
+ +-----------------+
+-| Vehicle Sensor  |
++| Vehicle Sensors |
+ +--------+--------+
+          |
+          v

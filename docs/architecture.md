@@ -2,7 +2,7 @@
 
 ## Introduction
 
-The Car Health Check platform provides real-time monitoring and diagnostics for connected vehicles. The system collects vehicle telemetry, analyzes health indicators, and notifies users when potential issues are detected.
+The Car Health Check solution delivers continuous vehicle health monitoring and predictive diagnostics for connected fleets. It gathers telemetry data from onboard systems, evaluates operational conditions using health analytics, and proactively alerts users about anomalies before they become critical failures.
 
 ## System Components
 
