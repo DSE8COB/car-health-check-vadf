@@ -1,0 +1,549 @@
+/*
+ * ==========================================================
+ * CREATE FINDING BUTTON
+ * ==========================================================
+ */
+
+#create-finding-button {
+    position: absolute;
+    z-index: 10000;
+    padding: 9px 15px;
+    border: 0;
+    border-radius: 4px;
+    color: #ffffff;
+    background: #007bc0;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28);
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+#create-finding-button:hover {
+    background: #005691;
+}
+
+#create-finding-button:focus {
+    outline: 3px solid rgba(0, 123, 192, 0.35);
+    outline-offset: 2px;
+}
+
+/*
+ * ==========================================================
+ * CREATE FINDING MODAL
+ * ==========================================================
+ */
+
+#review-finding-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 11000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.56);
+    box-sizing: border-box;
+}
+
+.review-modal-content {
+    width: min(570px, 95vw);
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 24px;
+    border-radius: 6px;
+    background: #ffffff;
+    box-shadow: 0 10px 32px rgba(0, 0, 0, 0.32);
+    box-sizing: border-box;
+}
+
+.review-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.review-modal-header h3 {
+    margin: 0;
+    color: #263238;
+    font-size: 22px;
+}
+
+.review-close-button {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    color: #455a64;
+    background: transparent;
+    cursor: pointer;
+    font-size: 30px;
+    line-height: 32px;
+}
+
+.review-close-button:hover {
+    color: #ffffff;
+    background: #607d8b;
+}
+
+.review-form-group {
+    margin-bottom: 18px;
+}
+
+.review-form-group label {
+    display: block;
+    margin-bottom: 7px;
+    color: #263238;
+    font-weight: 600;
+}
+
+#review-selected-text {
+    max-height: 125px;
+    overflow-y: auto;
+    padding: 12px;
+    border-left: 4px solid #007bc0;
+    border-radius: 2px;
+    color: #37474f;
+    background: #f1f7fa;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+#review-finding-severity,
+#review-finding-description {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #b0bec5;
+    border-radius: 3px;
+    color: #263238;
+    background: #ffffff;
+    box-sizing: border-box;
+    font: inherit;
+}
+
+#review-finding-description {
+    min-height: 120px;
+    resize: vertical;
+}
+
+#review-finding-severity:focus,
+#review-finding-description:focus {
+    border-color: #007bc0;
+    outline: 2px solid rgba(0, 123, 192, 0.2);
+}
+
+.review-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.review-primary-button,
+.review-secondary-button {
+    padding: 9px 17px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: 600;
+}
+
+.review-primary-button {
+    border: 1px solid #007bc0;
+    color: #ffffff;
+    background: #007bc0;
+}
+
+.review-primary-button:hover {
+    border-color: #005691;
+    background: #005691;
+}
+
+.review-secondary-button {
+    border: 1px solid #78909c;
+    color: #37474f;
+    background: #ffffff;
+}
+
+.review-secondary-button:hover {
+    background: #eceff1;
+}
+
+/*
+ * ==========================================================
+ * INLINE FINDING HIGHLIGHTS
+ * ==========================================================
+ */
+
+.review-finding-highlight {
+    padding: 1px 2px;
+    border-radius: 2px;
+    cursor: pointer;
+    transition:
+        outline 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.review-finding-highlight.severity-critical {
+    border-bottom: 3px solid #c62828;
+    color: inherit;
+    background: #ffcdd2;
+}
+
+.review-finding-highlight.severity-major {
+    border-bottom: 3px solid #ef6c00;
+    color: inherit;
+    background: #ffe0b2;
+}
+
+.review-finding-highlight.severity-minor {
+    border-bottom: 3px solid #f9a825;
+    color: inherit;
+    background: #fff9c4;
+}
+
+.review-finding-highlight.severity-info {
+    border-bottom: 3px solid #0277bd;
+    color: inherit;
+    background: #b3e5fc;
+}
+
+.review-highlight-focus {
+    outline: 4px solid #007bc0;
+    outline-offset: 4px;
+    box-shadow: 0 0 0 8px rgba(0, 123, 192, 0.18);
+}
+
+/*
+ * ==========================================================
+ * FINDINGS SIDEBAR
+ * ==========================================================
+ */
+
+#review-findings-sidebar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    z-index: 9000;
+    width: 380px;
+    max-width: 95vw;
+    height: 100vh;
+    overflow-y: auto;
+    border-left: 1px solid #cfd8dc;
+    color: #263238;
+    background: #f7f9fa;
+    box-shadow: -6px 0 20px rgba(0, 0, 0, 0.16);
+    box-sizing: border-box;
+    transition: transform 0.22s ease;
+}
+
+#review-findings-sidebar.review-sidebar-hidden {
+    transform: translateX(100%);
+}
+
+.review-sidebar-header {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 16px;
+    color: #ffffff;
+    background: #005691;
+}
+
+.review-sidebar-header h3 {
+    margin: 0 0 3px;
+    color: #ffffff;
+    font-size: 19px;
+}
+
+#review-findings-count {
+    color: #d8edf8;
+    font-size: 12px;
+}
+
+#review-sidebar-toggle {
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    color: #ffffff;
+    background: transparent;
+    cursor: pointer;
+    font-size: 28px;
+    line-height: 30px;
+}
+
+#review-sidebar-toggle:hover {
+    background: rgba(255, 255, 255, 0.18);
+}
+
+#review-sidebar-open {
+    position: fixed;
+    top: 43%;
+    right: 0;
+    z-index: 9000;
+    padding: 13px 9px;
+    border: 0;
+    border-radius: 5px 0 0 5px;
+    color: #ffffff;
+    background: #005691;
+    box-shadow: -3px 3px 10px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: 600;
+    writing-mode: vertical-rl;
+}
+
+#review-sidebar-open:hover {
+    background: #007bc0;
+}
+
+.review-sidebar-toolbar {
+    position: sticky;
+    top: 72px;
+    z-index: 1;
+    padding: 10px 14px;
+    border-bottom: 1px solid #d5dde1;
+    background: #ffffff;
+}
+
+#review-status-filter {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #b0bec5;
+    border-radius: 3px;
+    color: #263238;
+    background: #ffffff;
+    box-sizing: border-box;
+    font: inherit;
+}
+
+#review-findings-list {
+    padding: 14px;
+}
+
+/*
+ * ==========================================================
+ * FINDING CARDS
+ * ==========================================================
+ */
+
+.review-finding-card {
+    margin-bottom: 14px;
+    padding: 13px;
+    border: 1px solid #d5dde1;
+    border-left: 5px solid #007bc0;
+    border-radius: 5px;
+    color: #263238;
+    background: #ffffff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+    transition:
+        outline 0.2s ease,
+        box-shadow 0.2s ease,
+        opacity 0.2s ease;
+}
+
+.review-current-page-finding {
+    border-left-color: #43a047;
+}
+
+.review-finding-page {
+    display: block;
+    width: 100%;
+    margin: 0 0 10px;
+    padding: 0 0 8px;
+    border: 0;
+    border-bottom: 1px solid #d5dde1;
+    color: #005691;
+    background: transparent;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    text-align: left;
+}
+
+.review-finding-page:hover {
+    color: #007bc0;
+    text-decoration: underline;
+}
+
+.review-card-top-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 9px;
+}
+
+.review-severity,
+.review-status {
+    display: inline-block;
+    padding: 3px 9px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.review-severity {
+    color: #ffffff;
+}
+
+.review-severity.severity-critical {
+    background: #c62828;
+}
+
+.review-severity.severity-major {
+    background: #ef6c00;
+}
+
+.review-severity.severity-minor {
+    color: #212121;
+    background: #fbc02d;
+}
+
+.review-severity.severity-info {
+    background: #0277bd;
+}
+
+.review-status-open {
+    color: #0d47a1;
+    background: #e3f2fd;
+}
+
+.review-status-resolved {
+    color: #1b5e20;
+    background: #e8f5e9;
+}
+
+.review-card-selected-text {
+    max-height: 90px;
+    overflow-y: auto;
+    margin-bottom: 9px;
+    padding: 8px;
+    border-left: 3px solid #90a4ae;
+    color: #455a64;
+    background: #f5f7f8;
+    font-size: 13px;
+    font-style: italic;
+    overflow-wrap: anywhere;
+}
+
+.review-card-description {
+    margin: 9px 0;
+    color: #263238;
+    font-size: 14px;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+}
+
+.review-card-metadata {
+    display: block;
+    color: #78909c;
+    font-size: 11px;
+}
+
+.review-card-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 12px;
+}
+
+.review-card-actions button {
+    padding: 6px 9px;
+    border: 1px solid #78909c;
+    border-radius: 3px;
+    color: #37474f;
+    background: #ffffff;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.review-card-actions button:hover {
+    background: #eceff1;
+}
+
+.review-card-actions .review-locate-button {
+    color: #005691;
+    border-color: #007bc0;
+}
+
+.review-card-actions .review-resolve-button {
+    color: #2e7d32;
+    border-color: #43a047;
+}
+
+.review-card-actions .review-delete-button {
+    color: #b71c1c;
+    border-color: #c62828;
+}
+
+.review-card-actions .review-delete-button:hover {
+    color: #ffffff;
+    background: #c62828;
+}
+
+.review-finding-resolved {
+    opacity: 0.68;
+}
+
+.review-finding-resolved .review-card-description,
+.review-finding-resolved .review-card-selected-text {
+    text-decoration: line-through;
+}
+
+.review-card-focus {
+    outline: 4px solid #007bc0;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 7px rgba(0, 123, 192, 0.16);
+}
+
+.review-empty-state {
+    padding: 24px 16px;
+    color: #607d8b;
+    text-align: center;
+    line-height: 1.5;
+}
+
+/*
+ * ==========================================================
+ * RESPONSIVE DESIGN
+ * ==========================================================
+ */
+
+@media (max-width: 900px) {
+    #review-findings-sidebar {
+        width: min(380px, 92vw);
+    }
+}
+
+@media (max-width: 520px) {
+    .review-modal-content {
+        padding: 18px;
+    }
+
+    .review-modal-actions {
+        flex-direction: column-reverse;
+    }
+
+    .review-primary-button,
+    .review-secondary-button {
+        width: 100%;
+    }
+
+    #review-findings-sidebar {
+        width: 100vw;
+        max-width: 100vw;
+    }
+}

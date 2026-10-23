@@ -44,3 +44,11 @@ html_title = 'Car Health Check Documentation'
 
 # Enable section anchors
 myst_heading_anchors = 3
+
+html_js_files = [
+    "reviewtool.js",
+]
+
+html_css_files = [
+    "reviewtool.css",
+]
