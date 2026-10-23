@@ -1,0 +1,242 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Deployment Guide &mdash; Car Health Check Documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Car Health Check
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Deployment Guide</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#deployment-environment">Deployment Environment</a></li>
+<li><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li><a class="reference internal" href="#build-container-image">Build Container Image</a></li>
+<li><a class="reference internal" href="#push-image">Push Image</a></li>
+<li><a class="reference internal" href="#deploy-application">Deploy Application</a></li>
+<li><a class="reference internal" href="#verify-pods">Verify Pods</a></li>
+<li><a class="reference internal" href="#verify-service">Verify Service</a></li>
+<li><a class="reference internal" href="#verify-route">Verify Route</a></li>
+<li><a class="reference internal" href="#database-configuration">Database Configuration</a></li>
+<li><a class="reference internal" href="#health-check">Health Check</a></li>
+<li><a class="reference internal" href="#rollback">Rollback</a></li>
+<li><a class="reference internal" href="#monitoring">Monitoring</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Car Health Check</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Deployment Guide</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/source/deployment.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="deployment-guide">
+<h1>Deployment Guide<a class="headerlink" href="#deployment-guide" title="Link to this heading"></a></h1>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
+<p>This document describes the deployment procedure for the Car Health Check application.</p>
+</section>
+<section id="deployment-environment">
+<h2>Deployment Environment<a class="headerlink" href="#deployment-environment" title="Link to this heading"></a></h2>
+<p>The application is deployed using containers on OpenShift.</p>
+</section>
+<section id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading"></a></h2>
+<p>Before deployment, verify:</p>
+<ul class="simple">
+<li><p>OpenShift access is available</p></li>
+<li><p>Docker image is built</p></li>
+<li><p>Database is running</p></li>
+<li><p>Service account permissions are configured</p></li>
+</ul>
+</section>
+<section id="build-container-image">
+<h2>Build Container Image<a class="headerlink" href="#build-container-image" title="Link to this heading"></a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>build<span class="w"> </span>-t<span class="w"> </span>car-health-check:1.0<span class="w"> </span>.
+</pre></div>
+</div>
+</section>
+<section id="push-image">
+<h2>Push Image<a class="headerlink" href="#push-image" title="Link to this heading"></a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>tag<span class="w"> </span>car-health-check:1.0<span class="w"> </span>registry.company.com/car-health-check:1.0
+
+docker<span class="w"> </span>push<span class="w"> </span>registry.company.com/car-health-check:1.0
+</pre></div>
+</div>
+</section>
+<section id="deploy-application">
+<h2>Deploy Application<a class="headerlink" href="#deploy-application" title="Link to this heading"></a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>oc<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>deployment.yaml
+</pre></div>
+</div>
+</section>
+<section id="verify-pods">
+<h2>Verify Pods<a class="headerlink" href="#verify-pods" title="Link to this heading"></a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>oc<span class="w"> </span>get<span class="w"> </span>pods
+</pre></div>
+</div>
+<p>Expected Output:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>car-health-check-5d5cf8 Running
+</pre></div>
+</div>
+</section>
+<section id="verify-service">
+<h2>Verify Service<a class="headerlink" href="#verify-service" title="Link to this heading"></a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>oc<span class="w"> </span>get<span class="w"> </span>svc
+</pre></div>
+</div>
+<p>Expected Output:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>car-health-check-service
+</pre></div>
+</div>
+</section>
+<section id="verify-route">
+<h2>Verify Route<a class="headerlink" href="#verify-route" title="Link to this heading"></a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>oc<span class="w"> </span>get<span class="w"> </span>route
+</pre></div>
+</div>
+<p>Example:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>https://car-health-check.apps.cluster.example.com
+</pre></div>
+</div>
+</section>
+<section id="database-configuration">
+<h2>Database Configuration<a class="headerlink" href="#database-configuration" title="Link to this heading"></a></h2>
+<p>The following values must be configured:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>DB_HOST</p></td>
+<td><p>Database Host</p></td>
+</tr>
+<tr class="row-odd"><td><p>DB_PORT</p></td>
+<td><p>Database Port</p></td>
+</tr>
+<tr class="row-even"><td><p>DB_NAME</p></td>
+<td><p>Database Name</p></td>
+</tr>
+<tr class="row-odd"><td><p>DB_USER</p></td>
+<td><p>Database User</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="health-check">
+<h2>Health Check<a class="headerlink" href="#health-check" title="Link to this heading"></a></h2>
+<p>Application health endpoint:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>/actuator/health
+</pre></div>
+</div>
+<p>Example:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"UP"</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="rollback">
+<h2>Rollback<a class="headerlink" href="#rollback" title="Link to this heading"></a></h2>
+<p>Rollback to previous deployment:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>oc<span class="w"> </span>rollout<span class="w"> </span>undo<span class="w"> </span>deployment/car-health-check
+</pre></div>
+</div>
+</section>
+<section id="monitoring">
+<h2>Monitoring<a class="headerlink" href="#monitoring" title="Link to this heading"></a></h2>
+<p>Monitor the following:</p>
+<ul class="simple">
+<li><p>CPU Utilization</p></li>
+<li><p>Memory Utilization</p></li>
+<li><p>Error Rate</p></li>
+<li><p>API Response Time</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

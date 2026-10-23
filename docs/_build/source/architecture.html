@@ -1,0 +1,240 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Architecture &mdash; Car Health Check Documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Car Health Check
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Architecture</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a></li>
+<li><a class="reference internal" href="#system-components">System Components</a></li>
+<li><a class="reference internal" href="#logical-architecture">Logical Architecture</a></li>
+<li><a class="reference internal" href="#authentication">Authentication</a></li>
+<li><a class="reference internal" href="#roles">Roles</a><ul>
+<li><a class="reference internal" href="#administrator">Administrator</a></li>
+<li><a class="reference internal" href="#service-engineer">Service Engineer</a></li>
+<li><a class="reference internal" href="#vehicle-owner">Vehicle Owner</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#data-processing-flow">Data Processing Flow</a></li>
+<li><a class="reference internal" href="#non-functional-requirements">Non-Functional Requirements</a></li>
+<li><a class="reference internal" href="#future-enhancements">Future Enhancements</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Car Health Check</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Architecture</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/source/architecture.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="architecture">
+<h1>Architecture<a class="headerlink" href="#architecture" title="Link to this heading"></a></h1>
+<section id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading"></a></h2>
+<p>The Car Health Check platform provides real-time monitoring and diagnostics for connected vehicles. The system collects vehicle telemetry, analyzes health indicators, and notifies users when potential issues are detected.</p>
+</section>
+<section id="system-components">
+<h2>System Components<a class="headerlink" href="#system-components" title="Link to this heading"></a></h2>
+<p>The solution consists of the following major components:</p>
+<ul class="simple">
+<li><p>Web Application</p></li>
+<li><p>REST API Layer</p></li>
+<li><p>Vehicle Diagnostic Engine</p></li>
+<li><p>Notification Service</p></li>
+<li><p>Database</p></li>
+</ul>
+</section>
+<section id="logical-architecture">
+<h2>Logical Architecture<a class="headerlink" href="#logical-architecture" title="Link to this heading"></a></h2>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>+-----------------+
+| Vehicle Sensors |
++--------+--------+
+         |
+         v
++-----------------+
+| REST API Layer  |
++--------+--------+
+         |
+         v
++--------------------+
+| Diagnostic Engine  |
++----+----------+----+
+     |          |
+     v          v
++--------+   +--------+
+| Alerts |   | Reports|
++--------+   +--------+
+     |
+     v
++------------------+
+| Notification Sv. |
++------------------+
+</pre></div>
+</div>
+</section>
+<section id="authentication">
+<h2>Authentication<a class="headerlink" href="#authentication" title="Link to this heading"></a></h2>
+<p>The platform supports:</p>
+<ul class="simple">
+<li><p>OAuth2 Authentication</p></li>
+<li><p>JWT Token Validation</p></li>
+<li><p>Role-Based Access Control</p></li>
+</ul>
+</section>
+<section id="roles">
+<h2>Roles<a class="headerlink" href="#roles" title="Link to this heading"></a></h2>
+<section id="administrator">
+<h3>Administrator<a class="headerlink" href="#administrator" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Manage users</p></li>
+<li><p>Configure rules</p></li>
+<li><p>Monitor system health</p></li>
+</ul>
+</section>
+<section id="service-engineer">
+<h3>Service Engineer<a class="headerlink" href="#service-engineer" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Review diagnostics</p></li>
+<li><p>Investigate alerts</p></li>
+<li><p>Generate reports</p></li>
+</ul>
+</section>
+<section id="vehicle-owner">
+<h3>Vehicle Owner<a class="headerlink" href="#vehicle-owner" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>View vehicle status</p></li>
+<li><p>Receive notifications</p></li>
+<li><p>Download reports</p></li>
+</ul>
+</section>
+</section>
+<section id="data-processing-flow">
+<h2>Data Processing Flow<a class="headerlink" href="#data-processing-flow" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p>Vehicle sends telemetry data.</p></li>
+<li><p>API validates incoming data.</p></li>
+<li><p>Diagnostic engine evaluates vehicle health.</p></li>
+<li><p>Alerts are generated if thresholds are exceeded.</p></li>
+<li><p>Notifications are sent to users.</p></li>
+</ol>
+</section>
+<section id="non-functional-requirements">
+<h2>Non-Functional Requirements<a class="headerlink" href="#non-functional-requirements" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Requirement</p></th>
+<th class="head"><p>Value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Availability</p></td>
+<td><p>99.5%</p></td>
+</tr>
+<tr class="row-odd"><td><p>Response Time</p></td>
+<td><p>&lt; 2 seconds</p></td>
+</tr>
+<tr class="row-even"><td><p>Security</p></td>
+<td><p>HTTPS/TLS</p></td>
+</tr>
+<tr class="row-odd"><td><p>Scalability</p></td>
+<td><p>Horizontal Scaling</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="future-enhancements">
+<h2>Future Enhancements<a class="headerlink" href="#future-enhancements" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>AI-based diagnostics</p></li>
+<li><p>Predictive maintenance</p></li>
+<li><p>Fleet health analytics</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
