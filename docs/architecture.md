@@ -18,7 +18,7 @@ The solution consists of the following major components:
 
 ```text
 +-----------------+
-| Vehicle Sensors |
+| Vehicle Sensor  |
 +--------+--------+
          |
          v
