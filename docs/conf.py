@@ -6,13 +6,10 @@ author = 'Dinesh Senthilvel'
 release = '1.0.0'
 
 # Extensions
-extensions = [
-    'myst_parser'
-]
+extensions = []
 
-# Markdown support
 source_suffix = {
-    '.md': 'markdown',
+    '.rst': 'restructuredtext',
 }
 
 master_doc = 'index'

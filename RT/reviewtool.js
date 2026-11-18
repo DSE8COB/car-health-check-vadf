@@ -451,57 +451,129 @@
     }
 
     function parseGitDiff(patchText) {
+        patchText = patchText
+            .replace(/^\uFEFF/, "")
+            .replace(/\u0000/g, "");
+
         const lines = patchText.split(/\r?\n/);
         const changes = [];
         let currentFile = "";
         let currentNewLine = 0;
         let changeNumber = 0;
+        let deletedLines = [];
+        let addedLines = [];
+
+        function flushChangeBlock() {
+            const maximumLength = Math.max(deletedLines.length, addedLines.length);
+
+            for (let index = 0; index < maximumLength; index += 1) {
+                const deleted = deletedLines[index];
+                const added = addedLines[index];
+
+                if (deleted && added) {
+                    changeNumber += 1;
+                    changes.push({
+                        id: `pr-change-${changeNumber}`,
+                        type: "modified",
+                        sourceFile: normalizeSourceFile(currentFile),
+                        page: sourceFileToHtmlPage(currentFile),
+                        oldText: deleted.text,
+                        newText: added.text,
+                        oldCandidates: deleted.candidates,
+                        newCandidates: added.candidates,
+                        oldRawText: deleted.rawText,
+                        newRawText: added.rawText,
+                        line: added.line
+                    });
+                    continue;
+                }
+
+                if (added) {
+                    changeNumber += 1;
+                    changes.push({
+                        id: `pr-change-${changeNumber}`,
+                        type: "added",
+                        sourceFile: normalizeSourceFile(currentFile),
+                        page: sourceFileToHtmlPage(currentFile),
+                        text: added.text,
+                        candidates: added.candidates,
+                        rawText: added.rawText,
+                        line: added.line
+                    });
+                    continue;
+                }
+
+                if (deleted) {
+                    changeNumber += 1;
+                    changes.push({
+                        id: `pr-change-${changeNumber}`,
+                        type: "deleted",
+                        sourceFile: normalizeSourceFile(currentFile),
+                        page: sourceFileToHtmlPage(currentFile),
+                        text: deleted.text,
+                        candidates: deleted.candidates,
+                        rawText: deleted.rawText,
+                        line: null
+                    });
+                }
+            }
+
+            deletedLines = [];
+            addedLines = [];
+        }
+
+        function addLineToBlock(collection, rawText, lineNumber) {
+            if (!currentFile || !/\.(md|rst)$/i.test(currentFile)) return;
+            const candidates = markdownLineCandidates(rawText);
+            if (candidates.length === 0) return;
+            collection.push({
+                rawText,
+                text: candidates[0],
+                candidates,
+                line: lineNumber
+            });
+        }
 
         for (const line of lines) {
             if (line.startsWith("diff --git ")) {
+                flushChangeBlock();
                 const match = line.match(/^diff --git a\/(.+?) b\/(.+)$/);
                 currentFile = match ? match[2] : "";
                 continue;
             }
+
             if (line.startsWith("+++ b/")) {
                 currentFile = line.substring(6);
                 continue;
             }
+
             if (line.startsWith("@@")) {
+                flushChangeBlock();
                 const match = line.match(/^@@ -\d+(?:,\d+)? \+(\d+)(?:,\d+)? @@/);
                 if (match) currentNewLine = Number(match[1]);
                 continue;
             }
+
+            if (line.startsWith("-") && !line.startsWith("---")) {
+                addLineToBlock(deletedLines, line.substring(1), null);
+                continue;
+            }
+
             if (line.startsWith("+") && !line.startsWith("+++")) {
-                addParsedChange("added", line.substring(1), currentFile, currentNewLine);
+                addLineToBlock(addedLines, line.substring(1), currentNewLine);
                 currentNewLine += 1;
                 continue;
             }
-            if (line.startsWith("-") && !line.startsWith("---")) {
-                addParsedChange("deleted", line.substring(1), currentFile, null);
-                continue;
+
+            if (deletedLines.length > 0 || addedLines.length > 0) {
+                flushChangeBlock();
             }
+
             if (line && !line.startsWith("\\")) currentNewLine += 1;
         }
 
+        flushChangeBlock();
         return changes;
-
-        function addParsedChange(type, rawText, sourceFile, lineNumber) {
-            if (!sourceFile || !/\.(md|rst)$/i.test(sourceFile)) return;
-            const candidates = markdownLineCandidates(rawText);
-            if (candidates.length === 0) return;
-            changeNumber += 1;
-            changes.push({
-                id: `pr-change-${changeNumber}`,
-                type,
-                sourceFile: normalizeSourceFile(sourceFile),
-                page: sourceFileToHtmlPage(sourceFile),
-                text: candidates[0],
-                candidates,
-                rawText,
-                line: lineNumber
-            });
-        }
     }
 
     function markdownLineCandidates(rawText) {
@@ -523,13 +595,9 @@
         if (!text) return [];
 
         if (text.includes("|")) {
-            return [
-                text,
-                text.replace(/\|/g, "").trim(),
-                ...text.split("|")
-                    .map(x => x.trim())
-                    .filter(Boolean)
-            ];
+            return text.split("|")
+                .map(cell => cell.trim())
+                .filter(cell => cell && !/^[\-:+\s]+$/.test(cell));
         }
         return [text];
     }
@@ -547,7 +615,10 @@
     function highlightChangesOnCurrentPage(changes) {
         const currentPage = normalizePagePath(window.location.pathname);
         changes
-            .filter(change => change.type === "added" && normalizePagePath(change.page) === currentPage)
+            .filter(change =>
+                (change.type === "added" || change.type === "modified") &&
+                normalizePagePath(change.page) === currentPage
+            )
             .forEach(highlightPullRequestChange);
     }
 
@@ -555,14 +626,21 @@
         const content = getDocumentContentElement();
         if (!content) return false;
 
+        const candidates = change.type === "modified"
+            ? change.newCandidates
+            : change.candidates;
+
+        if (!candidates || candidates.length === 0) return false;
+
         let match = null;
-        for (const candidate of change.candidates) {
+        for (const candidate of candidates) {
             match = findTextNodeMatch(content, candidate);
             if (match) {
                 change.matchedText = candidate;
                 break;
             }
         }
+
         if (!match) {
             console.warn("Could not highlight PR change:", change);
             return false;
@@ -571,10 +649,14 @@
         const range = document.createRange();
         range.setStart(match.node, match.index);
         range.setEnd(match.node, match.index + match.text.length);
+
         const span = document.createElement("span");
         span.className = `review-pr-change review-change-${change.type}`;
         span.dataset.changeId = change.id;
-        span.title = change.line ? `Changed in pull request, source line ${change.line}` : "Changed in pull request";
+        span.title = change.type === "modified"
+            ? "Modified in pull request"
+            : "Added in pull request";
+
         range.surroundContents(span);
         span.addEventListener("click", () => focusPullRequestChangeCard(change.id));
         return true;
@@ -583,11 +665,17 @@
     function createPullRequestChangesPanel(changes) {
         const panel = document.createElement("aside");
         panel.id = "review-pr-changes-panel";
+
+        const modified = changes.filter(change => change.type === "modified").length;
         const added = changes.filter(change => change.type === "added").length;
         const deleted = changes.filter(change => change.type === "deleted").length;
+
         panel.innerHTML = `
             <div class="review-changes-header">
-                <div><h3>PR Changes</h3><span>${added} added, ${deleted} deleted</span></div>
+                <div>
+                    <h3>PR Changes</h3>
+                    <span>${modified} modified, ${added} added, ${deleted} deleted</span>
+                </div>
                 <button id="review-changes-close" type="button" aria-label="Close PR changes panel">&times;</button>
             </div>
             <div id="review-pr-changes-list"></div>`;
@@ -604,6 +692,7 @@
             panel.classList.add("review-changes-hidden");
             openButton.style.display = "block";
         });
+
         openButton.addEventListener("click", function () {
             panel.classList.remove("review-changes-hidden");
             openButton.style.display = "none";
@@ -614,7 +703,9 @@
 
     function renderPullRequestChanges(changes) {
         const list = document.getElementById("review-pr-changes-list");
+        if (!list) return;
         list.replaceChildren();
+
         changes.forEach(function (change) {
             const card = document.createElement("div");
             card.className = `review-change-card review-change-card-${change.type}`;
@@ -628,23 +719,58 @@
 
             const type = document.createElement("span");
             type.className = `review-change-type review-change-type-${change.type}`;
-            type.textContent = change.type === "added" ? "Added" : "Deleted";
+            type.textContent = change.type === "modified"
+                ? "Modified"
+                : change.type === "added" ? "Added" : "Deleted";
 
-            const text = document.createElement("div");
-            text.className = "review-change-text";
-            text.textContent = change.text;
+            card.append(pageButton, type);
+
+            if (change.type === "modified") {
+                const comparison = document.createElement("div");
+                comparison.className = "review-before-after";
+
+                const before = document.createElement("div");
+                before.className = "review-diff-section review-diff-before";
+                const beforeLabel = document.createElement("div");
+                beforeLabel.className = "review-diff-label";
+                beforeLabel.textContent = "Before";
+                const beforeText = document.createElement("div");
+                beforeText.className = "review-diff-text";
+                beforeText.textContent = change.oldText;
+                before.append(beforeLabel, beforeText);
+
+                const after = document.createElement("div");
+                after.className = "review-diff-section review-diff-after";
+                const afterLabel = document.createElement("div");
+                afterLabel.className = "review-diff-label";
+                afterLabel.textContent = "After";
+                const afterText = document.createElement("div");
+                afterText.className = "review-diff-text";
+                afterText.textContent = change.newText;
+                after.append(afterLabel, afterText);
+
+                comparison.append(before, after);
+                card.appendChild(comparison);
+            } else {
+                const text = document.createElement("div");
+                text.className = "review-change-text";
+                text.textContent = change.text;
+                card.appendChild(text);
+            }
 
             const source = document.createElement("small");
             source.className = "review-change-source";
-            source.textContent = change.line ? `${change.sourceFile}, line ${change.line}` : change.sourceFile;
+            source.textContent = change.line
+                ? `${change.sourceFile}, line ${change.line}`
+                : change.sourceFile;
 
             const locate = document.createElement("button");
             locate.type = "button";
             locate.className = "review-change-locate";
-            locate.textContent = change.type === "added" ? "Locate" : "Open Page";
+            locate.textContent = change.type === "deleted" ? "Open Page" : "Locate";
             locate.addEventListener("click", () => locatePullRequestChange(change.id));
 
-            card.append(pageButton, type, text, source, locate);
+            card.append(source, locate);
             list.appendChild(card);
         });
     }
@@ -652,14 +778,17 @@
     function locatePullRequestChange(changeId) {
         const change = pullRequestChanges.find(item => item.id === changeId);
         if (!change) return;
+
         if (normalizePagePath(change.page) !== normalizePagePath(window.location.pathname)) {
             window.location.href = `${change.page}?locateChange=${encodeURIComponent(change.id)}`;
             return;
         }
+
         if (change.type === "deleted") {
             alert("This content was deleted and is not present in the rendered document.");
             return;
         }
+
         scrollToPullRequestChange(change.id);
     }
 
